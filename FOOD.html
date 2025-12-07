@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AllergyGuard - AI Food Allergen Scanner</title>
+    <style>
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* App Container */
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .logo-text p {
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            background: #f3f4f6;
+            padding: 8px;
+            border-radius: 15px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            color: #6b7280;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: white;
+            color: #2563eb;
+        }
+
+        /* Main Content */
+        .content-area {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
+        }
+
+        /* Profile View */
+        .profile-container {
+            text-align: center;
+        }
+
+        .profile-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+
+        .profile-subtitle {
+            color: #6b7280;
+            font-size: 17px;
+            margin-bottom: 40px;
+        }
+
+        .sensitivity-section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #374151;
+            text-align: center;
+        }
+
+        .sensitivity-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .sensitivity-card {
+            flex: 1;
+            background: #f9fafb;
+            border: 3px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            max-width: 250px;
+        }
+
+        .sensitivity-card:hover {
+            border-color: #2563eb;
+            transform: translateY(-5px);
+        }
+
+        .sensitivity-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .sensitivity-card p {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        .allergens-section {
+            margin-bottom: 50px;
+        }
+
+        .allergens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .allergen-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .allergen-card:hover {
+            border-color: #ef4444;
+            transform: translateY(-3px);
+        }
+
+        .allergen-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .allergen-name {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            display: inline-block;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Scanner View */
+        .scanner-container {
+            text-align: center;
+        }
+
+        .scanner-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: #1f2937;
+        }
+
+        .camera-box {
+            background: #f3f4f6;
+            border-radius: 15px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-placeholder {
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        .camera-placeholder svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .camera-placeholder p {
+            font-size: 18px;
+        }
+
+        .scanner-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .control-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 200px;
+        }
+
+        .control-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-3px);
+        }
+
+        .control-btn.secondary {
+            background: #6b7280;
+        }
+
+        .control-btn.secondary:hover {
+            background: #4b5563;
+        }
+
+        .tips-box {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: left;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .tips-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tips-list {
+            list-style: none;
+        }
+
+        .tips-list li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+            font-size: 16px;
+            color: #374151;
+        }
+
+        .tips-list li:before {
+            content: "✓";
+            color: #2563eb;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* Processing View */
+        .processing-container {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .processing-spinner {
+            width: 100px;
+            height: 100px;
+            border: 8px solid #e5e7eb;
+            border-top-color: #2563eb;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+            margin: 0 auto 40px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .processing-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        .processing-text {
+            color: #6b7280;
+            font-size: 18px;
+        }
+
+        /* Result View */
+        .result-container {
+            text-align: center;
+        }
+
+        .result-header {
+            margin-bottom: 40px;
+        }
+
+        .result-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+        }
+
+        .result-icon.safe {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .result-icon.unsafe {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .result-icon.uncertain {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .result-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        .result-message {
+            font-size: 20px;
+            color: #4b5563;
+            margin-bottom: 10px;
+        }
+
+        .result-details {
+            background: #f9fafb;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .detected-allergens {
+            margin-bottom: 30px;
+        }
+
+        .detected-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        .allergen-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .allergen-tag {
+            background: #ef4444;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .extracted-text {
+            margin-bottom: 20px;
+        }
+
+        .extracted-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        .text-content {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            padding: 18px 35px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+        }
+
+        .action-btn.secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .disclaimer {
+            background: #f3f4f6;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 14px;
+            color: #6b7280;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Demo Notice */
+        .demo-notice {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 40px;
+            text-align: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .nav-tabs {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .sensitivity-options {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .sensitivity-card {
+                max-width: 100%;
+            }
+
+            .allergens-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .scanner-controls,
+            .result-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .control-btn,
+            .action-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .camera-box {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 10px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .allergens-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-title {
+                font-size: 24px;
+            }
+
+            .scanner-title {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    🛡️
+                </div>
+                <div class="logo-text">
+                    <h1>AllergyGuard</h1>
+                    <p>AI-Powered Food Allergen Scanner</p>
+                </div>
+            </div>
+            <div class="nav-tabs">
+                <button class="tab-btn" onclick="showView('profile')">Profile</button>
+                <button class="tab-btn" onclick="showView('scanner')">Scanner</button>
+                <button class="tab-btn" onclick="showView('result')">Results</button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            <!-- Profile View -->
+            <div id="profile-view">
+                <div class="profile-container">
+                    <h2 class="profile-title">Your Allergy Profile</h2>
+                    <p class="profile-subtitle">Select your allergens and sensitivity level for personalized scanning</p>
+                    
+                    <div class="sensitivity-section">
+                        <h3 class="section-title">Sensitivity Level</h3>
+                        <div class="sensitivity-options">
+                            <div class="sensitivity-card" onclick="selectSensitivity(this)">
+                                <h3>Low Sensitivity</h3>
+                                <p>Mild reactions, avoid direct consumption</p>
+                            </div>
+                            <div class="sensitivity-card" onclick="selectSensitivity(this)">
+                                <h3>Medium Sensitivity</h3>
+                                <p>Moderate reactions, avoid traces</p>
+                            </div>
+                            <div class="sensitivity-card" onclick="selectSensitivity(this)">
+                                <h3>High Sensitivity</h3>
+                                <p>Severe reactions, avoid cross-contact</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="allergens-section">
+                        <h3 class="section-title">Select Your Allergens</h3>
+                        <div class="allergens-grid">
+                            <div class="allergen-card" onclick="selectAllergen(this)">
+                                <span class="allergen-icon">🥛</span>
+                                <span class="allergen-name">Milk & Dairy</span>
+                            </div>
+                            <div class="allergen-card" onclick="selectAllergen(this)">
+                                <span class="allergen-icon">🥚</span>
+                                <span class="allergen-name">Eggs</span>
+                            </div>
+                            <div class="allergen-card" onclick="selectAllergen(this)">
+                                <span class="allergen-icon">🥜</span>
+                                <span class="allergen-name">Peanuts</span>
+                            </div>
+                            <div class="allergen-card" onclick="selectAllergen(this)">
+                                <span class="allergen-icon">🌰</span>
+                                <span class="allergen-name">Tree Nuts</span>
+                            </div>
+                            <div class="allergen-card" onclick="selectAllergen(this)">
+                                <span class="allergen-icon">🌱</span>
+                                <span class="allergen-name">Soy</span>
+                            </div>
+                            <div class="allergen-card" onclick="selectAllergen(this)">
+                                <span class="allergen-icon">🌾</span>
+                                <span class="allergen-name">Wheat & Gluten</span>
+                            </div>
+                            <div class="allergen-card" onclick="selectAllergen(this)">
+                                <span class="allergen-icon">🐟</span>
+                                <span class="allergen-name">Fish</span>
+                            </div>
+                            <div class="allergen-card" onclick="selectAllergen(this)">
+                                <span class="allergen-icon">🦐</span>
+                                <span class="allergen-name">Shellfish</span>
+                            </div>
+                            <div class="allergen-card" onclick="selectAllergen(this)">
+                                <span class="allergen-icon">⚫</span>
+                                <span class="allergen-name">Sesame</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="save-btn" onclick="saveProfile()">
+                        Save Profile & Start Scanning
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scanner View -->
+            <div id="scanner-view" style="display: none;">
+                <div class="scanner-container">
+                    <h2 class="scanner-title">Scan Ingredient List</h2>
+                    
+                    <div class="camera-box">
+                        <div class="camera-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
+                            </svg>
+                            <p>Camera ready for scanning</p>
+                        </div>
+                    </div>
+                    
+                    <div class="scanner-controls">
+                        <button class="control-btn" onclick="simulateCapture()">
+                            📸 Capture Photo
+                        </button>
+                        <button class="control-btn secondary" onclick="showUpload()">
+                            📁 Upload Image
+                        </button>
+                    </div>
+                    
+                    <div class="tips-box">
+                        <h3 class="tips-title">
+                            💡 Tips for Best Results
+                        </h3>
+                        <ul class="tips-list">
+                            <li>Ensure good lighting on the ingredient list</li>
+                            <li>Hold camera steady and parallel to text</li>
+                            <li>Make sure text is clear and in focus</li>
+                            <li>Capture the entire ingredient list</li>
+                            <li>Check for "may contain" warnings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Processing View -->
+            <div id="processing-view" style="display: none;">
+                <div class="processing-container">
+                    <div class="processing-spinner"></div>
+                    <h3 class="processing-title">Analyzing Ingredients...</h3>
+                    <p class="processing-text">Scanning for allergens in your photo</p>
+                </div>
+            </div>
+
+            <!-- Result View -->
+            <div id="result-view" style="display: none;">
+                <div class="result-container">
+                    <div class="result-header">
+                        <div class="result-icon safe">
+                            ✅
+                        </div>
+                        <h2 class="result-title">Safe to Eat! 🎉</h2>
+                        <p class="result-message">No allergens detected for your profile</p>
+                        <p class="result-message">This product appears safe for you</p>
+                    </div>
+                    
+                    <div class="result-details">
+                        <div class="detected-allergens">
+                            <h3 class="detected-title">Detected Allergens:</h3>
+                            <div class="allergen-tags">
+                                <span class="allergen-tag">Milk</span>
+                                <span class="allergen-tag">Soy</span>
+                            </div>
+                        </div>
+                        
+                        <div class="extracted-text">
+                            <h3 class="extracted-title">Extracted Text:</h3>
+                            <div class="text-content">
+                                Ingredients: Water, sugar, natural flavors, citric acid, sodium benzoate (preservative). Contains no common allergens. This product is manufactured in a facility that also processes peanuts and tree nuts.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-actions">
+                        <button class="action-btn primary" onclick="showView('scanner')">
+                            🔄 Scan Same Product
+                        </button>
+                        <button class="action-btn secondary" onclick="showView('scanner')">
+                            📸 New Product
+                        </button>
+                    </div>
+                    
+                    <div class="disclaimer">
+                        <p>⚠️ This tool provides AI-powered assistance but should not replace medical advice. Always double-check ingredient labels and consult healthcare professionals for severe allergies.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Demo Notice -->
+        <footer class="demo-notice">
+            <p>🚀 <strong>Demo Version</strong> - Using mock OCR for demonstration. Connect to real OCR API for production use.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Simple JavaScript functions for UI interaction
+        function showView(viewName) {
+            // Hide all views
+            document.getElementById('profile-view').style.display = 'none';
+            document.getElementById('scanner-view').style.display = 'none';
+            document.getElementById('processing-view').style.display = 'none';
+            document.getElementById('result-view').style.display = 'none';
+            
+            // Show selected view
+            document.getElementById(viewName + '-view').style.display = 'block';
+            
+            // Update tab buttons
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => tab.style.backgroundColor = 'transparent');
+            
+            // Highlight active tab
+            const activeTab = document.querySelector(`.tab-btn[onclick*="${viewName}"]`);
+            if (activeTab) {
+                activeTab.style.backgroundColor = 'white';
+                activeTab.style.color = '#2563eb';
+                activeTab.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.2)';
+            }
+        }
+
+        function selectSensitivity(card) {
+            // Remove active state from all cards
+            const cards = document.querySelectorAll('.sensitivity-card');
+            cards.forEach(c => {
+                c.style.borderColor = '#e5e7eb';
+                c.style.boxShadow = 'none';
+            });
+            
+            // Add active state to selected card
+            card.style.borderColor = '#2563eb';
+            card.style.boxShadow = '0 5px 15px rgba(37, 99, 235, 0.2)';
+        }
+
+        function selectAllergen(card) {
+            // Toggle active state
+            if (card.style.borderColor === 'rgb(239, 68, 68)') {
+                card.style.borderColor = '#e5e7eb';
+                card.style.boxShadow = 'none';
+                card.style.backgroundColor = 'white';
+            } else {
+                card.style.borderColor = '#ef4444';
+                card.style.boxShadow = '0 3px 10px rgba(239, 68, 68, 0.2)';
+                card.style.backgroundColor = '#fef2f2';
+            }
+        }
+
+        function saveProfile() {
+            alert('Profile saved! You can now start scanning.');
+            showView('scanner');
+        }
+
+        function simulateCapture() {
+            showView('processing');
+            setTimeout(() => {
+                // Show random result after 2 seconds
+                const results = ['safe', 'unsafe', 'uncertain'];
+                const randomResult = results[Math.floor(Math.random() * results.length)];
+                
+                if (randomResult === 'unsafe') {
+                    document.querySelector('.result-icon').className = 'result-icon unsafe';
+                    document.querySelector('.result-icon').innerHTML = '❌';
+                    document.querySelector('.result-title').textContent = 'Not Safe! ⚠️';
+                    document.querySelector('.result-message').textContent = 'Contains: Milk, Soy';
+                    document.querySelector('.result-message').nextElementSibling.textContent = 'Avoid this product';
+                } else if (randomResult === 'uncertain') {
+                    document.querySelector('.result-icon').className = 'result-icon uncertain';
+                    document.querySelector('.result-icon').innerHTML = '⚠️';
+                    document.querySelector('.result-title').textContent = 'Needs Review 🔍';
+                    document.querySelector('.result-message').textContent = 'Unable to determine safety';
+                    document.querySelector('.result-message').nextElementSibling.textContent = 'Please review the ingredient list manually';
+                } else {
+                    document.querySelector('.result-icon').className = 'result-icon safe';
+                    document.querySelector('.result-icon').innerHTML = '✅';
+                    document.querySelector('.result-title').textContent = 'Safe to Eat! 🎉';
+                    document.querySelector('.result-message').textContent = 'No allergens detected for your profile';
+                    document.querySelector('.result-message').nextElementSibling.textContent = 'This product appears safe for you';
+                }
+                
+                showView('result');
+            }, 2000);
+        }
+
+        function showUpload() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function() {
+                if (this.files && this.files[0]) {
+                    simulateCapture();
+                }
+            };
+            input.click();
+        }
+
+        // Initialize the app
+        window.onload = function() {
+            showView('profile');
+            
+            // Set default sensitivity
+            const defaultSensitivity = document.querySelectorAll('.sensitivity-card')[0];
+            selectSensitivity(defaultSensitivity);
+        };
+    </script>
+</body>
+</html>
